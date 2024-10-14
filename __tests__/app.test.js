@@ -128,6 +128,14 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("GET: 400 -- responds with 400 Bad Request and an appropriate error message when the request is invalid", () => {
+    return request(app)
+      .get("/api/articles/not-a-number/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid input");
+      });
+  });
 });
 
 describe("/api/*", () => {
