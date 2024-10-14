@@ -23,7 +23,7 @@ exports.fetchArticles = () => {
     .then(({ rows: articles }) => articles);
 };
 
-exports.fetchArticleById = (article_id) => {
+const fetchArticleById = (article_id) => {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
     .then(({ rows: articles }) => {
@@ -32,4 +32,19 @@ exports.fetchArticleById = (article_id) => {
       }
       return articles[0];
     });
+};
+
+exports.fetchArticleById = fetchArticleById;
+
+exports.fetchCommentsByArticleId = (article_id) => {
+  // `fetchArticleById` will reject with a 404 if the article doesn't exist
+  return Promise.all([
+    db.query(
+      "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;",
+      [article_id]
+    ),
+    fetchArticleById(article_id),
+  ]).then(([{ rows: comments }]) => {
+    return comments;
+  });
 };

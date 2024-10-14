@@ -106,6 +106,53 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
+describe("/api/articles/:article_id/comments", () => {
+  test("GET: 200 -- responds with an array of the comments on the article with the given ID", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(2);
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id", expect.any(Number));
+          expect(comment).toHaveProperty("votes", expect.any(Number));
+          expect(comment).toHaveProperty("created_at", expect.any(String));
+          expect(new Date(comment.created_at)).not.toBeNaN();
+          expect(comment).toHaveProperty("author", expect.any(String));
+          expect(comment).toHaveProperty("body", expect.any(String));
+          expect(comment).toHaveProperty("article_id", 3);
+        });
+        expect(comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("GET: 200 -- responds with an empty array if the article has no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toStrictEqual([]);
+      });
+  });
+  test("GET: 404 -- responds with 404 Not Found and an appropriate error message when the article does not exist", () => {
+    return request(app)
+      .get("/api/articles/10000/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
+      });
+  });
+  test("GET: 400 -- responds with 400 Bad Request and an appropriate error message when the request is invalid", () => {
+    return request(app)
+      .get("/api/articles/not-a-number/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid input");
+      });
+  });
+});
+
 describe("/api/*", () => {
   test("ANY: 404 -- responds with a 404 Not Found and appropriate error message for an unknown url and/or method", () => {
     return request(app)
