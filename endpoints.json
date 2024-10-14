@@ -75,16 +75,14 @@
       "body": "What a great article"
     },
     "exampleResponse": {
-      "comment":    
-        {
-          "comment_id": 11,
-          "body": "What a great article",
-          "article_id": 3,
-          "author": "iUseNcNews",
-          "votes": 0,
-          "created_at": "2020-09-19T23:10:00.000Z"
-        }
-      
+      "comment": {
+        "comment_id": 11,
+        "body": "What a great article",
+        "article_id": 3,
+        "author": "iUseNcNews",
+        "votes": 0,
+        "created_at": "2020-09-19T23:10:00.000Z"
+      }
     }
-  } 
+  }
 }
