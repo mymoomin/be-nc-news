@@ -42,10 +42,6 @@ describe("/api/topics", () => {
   });
 });
 
-function sortDateStrings(date1, date2) {
-  return new Date(date1).valueOf() - new Date(date2).valueOf();
-}
-
 describe("/api/articles", () => {
   test("GET: 200 -- responds with an array of all articles", () => {
     return request(app)
@@ -68,7 +64,6 @@ describe("/api/articles", () => {
         });
         expect(articles).toBeSortedBy("created_at", {
           descending: true,
-          compare: sortDateStrings,
         });
       });
   });
