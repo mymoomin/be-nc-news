@@ -43,6 +43,43 @@ describe("/api/topics", () => {
   });
 });
 
+describe("/api/articles/:article_id", () => {
+  test("GET: 200 -- responds with the article with the given ID", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toStrictEqual({
+          author: "butter_bridge",
+          title: "Living in the shadow of a great man",
+          article_id: 1,
+          body: "I find this existence challenging",
+          topic: "mitch",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("GET: 404 -- responds with a 404 Not Found and appropriate error message when the article does not exist", () => {
+    return request(app)
+      .get("/api/articles/10000")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article not found");
+      });
+  });
+  test("GET: 400 -- responds with a 400 Bad Request and appropriate error message when the request is invalid", () => {
+    return request(app)
+      .get("/api/articles/not-a-number")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid input");
+      });
+  });
+});
+
 describe("/api/*", () => {
   test("ANY: 404 -- responds with a 404 Not Found and appropriate error message for an unknown url and/or method", () => {
     return request(app)
