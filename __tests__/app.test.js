@@ -151,6 +151,76 @@ describe("/api/articles/:article_id/comments", () => {
         expect(msg).toBe("Invalid input");
       });
   });
+
+  test("POST: 201 -- inserts the comment into the database and responds with the new comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "lurker", body: "This is a comment" })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toHaveProperty("comment_id", 19);
+        expect(comment).toHaveProperty("votes", 0);
+        expect(comment).toHaveProperty("created_at", expect.any(String));
+        expect(new Date(comment.created_at)).not.toBeNaN();
+        expect(comment).toHaveProperty("author", "lurker");
+        expect(comment).toHaveProperty("body", "This is a comment");
+        expect(comment).toHaveProperty("article_id", 1);
+      });
+  });
+
+  test("POST: 404 -- responds with 404 Not Found and an appropriate error message when the article does not exist", () => {
+    return request(app)
+      .post("/api/articles/10000/comments")
+      .send({ username: "lurker", body: "This is a comment" })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
+      });
+  });
+  test("POST: 404 -- responds with 404 Not Found and an appropriate error message when the user does not exist", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "NotAUser", body: "This is a comment" })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("User not found");
+      });
+  });
+
+  test("POST: 400 -- responds with 400 Bad Request and an appropriate error message when the article ID is invalid", () => {
+    return request(app)
+      .post("/api/articles/not-a-number/comments")
+      .send({ username: "lurker", body: "This is a comment" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid input");
+      });
+  });
+  test("POST: 400 -- responds with 400 Bad Request and an appropriate error message when the post body is missing required properties", () => {
+    return Promise.all([
+      request(app)
+        .post("/api/articles/1/comments")
+        .send({ body: "This is a comment" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing required properties: username");
+        }),
+      request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "lurker" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing required properties: body");
+        }),
+      request(app)
+        .post("/api/articles/1/comments")
+        .send({})
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing required properties: username, body");
+        }),
+    ]);
+  });
 });
 
 describe("/api/*", () => {
