@@ -203,14 +203,21 @@ describe("/api/articles/:article_id/comments", () => {
         .send({ body: "This is a comment" })
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Missing required property");
+          expect(msg).toBe("Missing required properties: username");
         }),
       request(app)
         .post("/api/articles/1/comments")
         .send({ username: "lurker" })
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Missing required property");
+          expect(msg).toBe("Missing required properties: body");
+        }),
+      request(app)
+        .post("/api/articles/1/comments")
+        .send({})
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing required properties: username, body");
         }),
     ]);
   });

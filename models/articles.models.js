@@ -38,12 +38,15 @@ const fetchArticleById = (article_id) => {
 exports.fetchArticleById = fetchArticleById;
 
 // rejects if the user doesn't exist
-const checkUserExists = (username) => {
+// If we ever make a GET /api/users/:username endpoint I'll move this there
+const fetchUserByUsername = (username) => {
   return db
     .query("SELECT * FROM users WHERE username = $1", [username])
     .then(({ rows: users }) => {
-      if (!users.length)
+      if (!users.length) {
         return Promise.reject({ status: 404, msg: "User not found" });
+      }
+      return users[0];
     });
 };
 
@@ -61,16 +64,25 @@ exports.fetchCommentsByArticleId = (article_id) => {
 };
 
 exports.insertCommentByArticleId = (article_id, comment) => {
+  // Check for properties
   const requiredProperties = ["username", "body"];
-  if (
-    requiredProperties.some((property) => !comment.hasOwnProperty(property))
-  ) {
-    return Promise.reject({ status: 400, msg: "Missing required property" });
+  const missingProperties = requiredProperties.filter(
+    (property) => !(property in comment)
+  );
+  if (missingProperties.length) {
+    return Promise.reject({
+      status: 400,
+      msg: `Missing required properties: ${missingProperties.join(", ")}`,
+    });
   }
+
+  // Only unpack once we've checked both properties exist
   const { username, body } = comment;
+
+  // Check that the article and user both exist
   return Promise.all([
-    checkArticleExists(article_id),
-    checkUserExists(username),
+    fetchArticleById(article_id),
+    fetchUserByUsername(username),
   ])
     .then(() =>
       db.query(
