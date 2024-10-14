@@ -42,6 +42,38 @@ describe("/api/topics", () => {
   });
 });
 
+function sortDateStrings(date1, date2) {
+  return new Date(date1).valueOf() - new Date(date2).valueOf();
+}
+
+describe("/api/articles", () => {
+  test("GET: 200 -- responds with an array of all articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).toHaveProperty("author", expect.any(String));
+          expect(article).toHaveProperty("title", expect.any(String));
+          expect(article).toHaveProperty("article_id", expect.any(Number));
+          expect(article).toHaveProperty("topic", expect.any(String));
+          expect(article).toHaveProperty("created_at", expect.any(String));
+          expect(new Date(article.created_at)).not.toBeNaN();
+          expect(article).toHaveProperty("votes", expect.any(Number));
+          expect(article).toHaveProperty("article_img_url", expect.any(String));
+          expect(() => new URL(article.article_img_url)).not.toThrow();
+          expect(article).toHaveProperty("comment_count", expect.any(Number));
+          expect(article).not.toHaveProperty("body");
+        });
+        expect(articles).toBeSortedBy("created_at", {
+          descending: true,
+          compare: sortDateStrings,
+        });
+      });
+  });
+});
+
 describe("/api/articles/:article_id", () => {
   test("GET: 200 -- responds with the article with the given ID", () => {
     return request(app)

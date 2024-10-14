@@ -1,15 +1,19 @@
 const express = require("express");
 
-const endpoints = require("./endpoints.json");
 const { getTopics } = require("./controllers/topics.controllers.js");
-const { getArticleById } = require("./controllers/articles.controllers.js");
 const { getRoot } = require("./controllers/root.controllers.js");
+const {
+  getArticleById,
+  getArticles,
+} = require("./controllers/articles.controllers.js");
 
 const app = express();
 
 app.get("/api", getRoot);
 
 app.get("/api/topics", getTopics);
+
+app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 
@@ -28,6 +32,8 @@ app.use((error, request, response, next) => {
 app.use((error, request, response, next) => {
   if (error.code === "22P02") {
     response.status(400).send({ msg: "Invalid input" });
+  } else {
+    next(error);
   }
 });
 
