@@ -37,6 +37,16 @@ const fetchArticleById = (article_id) => {
 
 exports.fetchArticleById = fetchArticleById;
 
+// rejects if the user doesn't exist
+const checkUserExists = (username) => {
+  return db
+    .query("SELECT * FROM users WHERE username = $1", [username])
+    .then(({ rows: users }) => {
+      if (!users.length)
+        return Promise.reject({ status: 404, msg: "User not found" });
+    });
+};
+
 exports.fetchCommentsByArticleId = (article_id) => {
   // `fetchArticleById` will reject with a 404 if the article doesn't exist
   return Promise.all([
@@ -51,7 +61,10 @@ exports.fetchCommentsByArticleId = (article_id) => {
 };
 
 exports.insertCommentByArticleId = (article_id, { username, body }) => {
-  return checkArticleExists(article_id)
+  return Promise.all([
+    checkArticleExists(article_id),
+    checkUserExists(username),
+  ])
     .then(() =>
       db.query(
         "INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;",

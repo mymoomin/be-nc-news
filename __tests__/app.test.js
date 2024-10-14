@@ -175,6 +175,15 @@ describe("/api/articles/:article_id/comments", () => {
         expect(msg).toBe("Article not found");
       });
   });
+  test("POST: 404 -- responds with 404 Not Found and an appropriate error message when the user does not exist", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "NotAUser", body: "This is a comment" })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("User not found");
+      });
+  });
 });
 
 describe("/api/*", () => {
