@@ -42,5 +42,49 @@
         "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
       }
     }
-  }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves all comments on the article with the id",
+    "queries": [],
+    "exampleResponse": {
+      "comments":    [
+        {
+          "comment_id": 11,
+          "body": "Ambidextrous marsupial",
+          "article_id": 3,
+          "author": "icellusedkars",
+          "votes": 0,
+          "created_at": "2020-09-19T23:10:00.000Z"
+        },
+        {
+          "comment_id": 10,
+          "body": "git push origin master",
+          "article_id": 3,
+          "author": "icellusedkars",
+          "votes": 0,
+          "created_at": "2020-06-20T07:24:00.000Z"
+        }
+      ]
+    }
+  }, 
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds the new comment to the database",
+    "queries": [],
+    "exampleBody": {
+      "username": "iUseNcNews",
+      "body": "What a great article"
+    },
+    "exampleResponse": {
+      "comment":    
+        {
+          "comment_id": 11,
+          "body": "What a great article",
+          "article_id": 3,
+          "author": "iUseNcNews",
+          "votes": 0,
+          "created_at": "2020-09-19T23:10:00.000Z"
+        }
+      
+    }
+  } 
 }
