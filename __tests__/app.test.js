@@ -6,7 +6,7 @@ const seed = require("../db/seeds/seed.js");
 
 const app = require("../app.js");
 
-const endpoints = require("../endpoints.json");
+const endpointsFile = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(data);
@@ -22,7 +22,7 @@ describe("/api", () => {
       .get("/api")
       .expect(200)
       .then(({ body: { endpoints } }) => {
-        expect(endpoints).toStrictEqual(endpoints);
+        expect(endpoints).toStrictEqual(endpointsFile);
       });
   });
 });
