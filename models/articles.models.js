@@ -23,7 +23,7 @@ exports.fetchArticles = () => {
     .then(({ rows: articles }) => articles);
 };
 
-exports.fetchArticleById = (article_id) => {
+const fetchArticleById = (article_id) => {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
     .then(({ rows: articles }) => {
@@ -34,24 +34,16 @@ exports.fetchArticleById = (article_id) => {
     });
 };
 
-// rejects if the article doesn't exist
-const checkArticleExists = (article_id) => {
-  return db
-    .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
-    .then(({ rows: articles }) => {
-      if (!articles.length)
-        return Promise.reject({ status: 404, msg: "Article not found" });
-    });
-};
+exports.fetchArticleById = fetchArticleById;
 
 exports.fetchCommentsByArticleId = (article_id) => {
-  // `Promise.all` rejects if any promise rejects
+  // `fetchArticleById` will reject with a 404 if the article doesn't exist
   return Promise.all([
     db.query(
       "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;",
       [article_id]
     ),
-    checkArticleExists(article_id),
+    fetchArticleById(article_id),
   ]).then(([{ rows: comments }]) => {
     return comments;
   });
