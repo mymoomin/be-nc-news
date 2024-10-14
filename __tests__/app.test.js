@@ -124,8 +124,23 @@ describe("/api/articles/:article_id/comments", () => {
         });
         expect(comments).toBeSortedBy("created_at", {
           descending: true,
-          compare: sortDateStrings,
         });
+      });
+  });
+  test("GET: 200 -- responds with an empty array if the article has no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toStrictEqual([]);
+      });
+  });
+  test("GET: 404 -- responds with 404 Not Found and an appropriate error message when the article does not exist", () => {
+    return request(app)
+      .get("/api/articles/10000/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
       });
   });
   test("GET: 400 -- responds with 400 Bad Request and an appropriate error message when the request is invalid", () => {
