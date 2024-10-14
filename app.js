@@ -1,7 +1,13 @@
 const express = require("express");
-const { getTopics } = require("./controllers/topics.controllers");
+
+const endpoints = require("./endpoints.json");
+const { getTopics } = require("./controllers/topics.controllers.js");
 
 const app = express();
+
+app.get("/api", (request, response, next) => {
+  response.status(200).send({ endpoints });
+});
 
 app.get("/api/topics", getTopics);
 

@@ -1,9 +1,12 @@
 const request = require("supertest");
 
-const app = require("../app.js");
 const db = require("../db/connection.js");
 const data = require("../db/data/test-data");
 const seed = require("../db/seeds/seed.js");
+
+const app = require("../app.js");
+
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(data);
@@ -11,6 +14,17 @@ beforeEach(() => {
 
 afterAll(() => {
   db.end();
+});
+
+describe("/api", () => {
+  test("GET: 200 -- responds with a json representation of all the available endpoints of the api", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.endpoints).toStrictEqual(endpoints);
+      });
+  });
 });
 
 describe("/api/topics", () => {
