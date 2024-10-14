@@ -166,6 +166,15 @@ describe("/api/articles/:article_id/comments", () => {
         expect(comment).toHaveProperty("article_id", 1);
       });
   });
+  test("POST: 404 -- responds with 404 Not Found and an appropriate error message when the article does not exist", () => {
+    return request(app)
+      .post("/api/articles/10000/comments")
+      .send({ username: "lurker", body: "This is a comment" })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
+      });
+  });
 });
 
 describe("/api/*", () => {
