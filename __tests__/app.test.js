@@ -151,6 +151,7 @@ describe("/api/articles/:article_id/comments", () => {
         expect(msg).toBe("Invalid input");
       });
   });
+
   test("POST: 201 -- inserts the comment into the database and responds with the new comment", () => {
     return request(app)
       .post("/api/articles/1/comments")
@@ -166,6 +167,7 @@ describe("/api/articles/:article_id/comments", () => {
         expect(comment).toHaveProperty("article_id", 1);
       });
   });
+
   test("POST: 404 -- responds with 404 Not Found and an appropriate error message when the article does not exist", () => {
     return request(app)
       .post("/api/articles/10000/comments")
@@ -183,6 +185,34 @@ describe("/api/articles/:article_id/comments", () => {
       .then(({ body: { msg } }) => {
         expect(msg).toBe("User not found");
       });
+  });
+
+  test("POST: 400 -- responds with 400 Bad Request and an appropriate error message when the article ID is invalid", () => {
+    return request(app)
+      .post("/api/articles/not-a-number/comments")
+      .send({ username: "lurker", body: "This is a comment" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid input");
+      });
+  });
+  test("POST: 400 -- responds with 400 Bad Request and an appropriate error message when the post body is missing required properties", () => {
+    return Promise.all([
+      request(app)
+        .post("/api/articles/1/comments")
+        .send({ body: "This is a comment" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing required property");
+        }),
+      request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "lurker" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing required property");
+        }),
+    ]);
   });
 });
 

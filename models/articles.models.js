@@ -60,7 +60,14 @@ exports.fetchCommentsByArticleId = (article_id) => {
   });
 };
 
-exports.insertCommentByArticleId = (article_id, { username, body }) => {
+exports.insertCommentByArticleId = (article_id, comment) => {
+  const requiredProperties = ["username", "body"];
+  if (
+    requiredProperties.some((property) => !comment.hasOwnProperty(property))
+  ) {
+    return Promise.reject({ status: 400, msg: "Missing required property" });
+  }
+  const { username, body } = comment;
   return Promise.all([
     checkArticleExists(article_id),
     checkUserExists(username),
