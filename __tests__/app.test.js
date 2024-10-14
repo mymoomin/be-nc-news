@@ -151,6 +151,21 @@ describe("/api/articles/:article_id/comments", () => {
         expect(msg).toBe("Invalid input");
       });
   });
+  test("POST: 201 -- inserts the comment into the database and responds with the new comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "lurker", body: "This is a comment" })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toHaveProperty("comment_id", 19);
+        expect(comment).toHaveProperty("votes", 0);
+        expect(comment).toHaveProperty("created_at", expect.any(String));
+        expect(new Date(comment.created_at)).not.toBeNaN();
+        expect(comment).toHaveProperty("author", "lurker");
+        expect(comment).toHaveProperty("body", "This is a comment");
+        expect(comment).toHaveProperty("article_id", 1);
+      });
+  });
 });
 
 describe("/api/*", () => {

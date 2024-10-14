@@ -6,9 +6,12 @@ const {
   getArticleById,
   getArticles,
   getCommentsByArticleId,
+  postCommentByArticleId,
 } = require("./controllers/articles.controllers.js");
 
 const app = express();
+
+app.use(express.json());
 
 app.get("/api", getRoot);
 
@@ -19,6 +22,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
+
+app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
 app.all("*", (request, response, next) => {
   response.status(404).send({ msg: "unknown endpoint" });
