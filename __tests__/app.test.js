@@ -70,6 +70,14 @@ describe("/api/articles/:article_id", () => {
         expect(res.body.msg).toBe("Article not found");
       });
   });
+  test("GET: 400 -- responds with a 400 Bad Request and appropriate error message when the request is invalid", () => {
+    return request(app)
+      .get("/api/articles/not-a-number")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid input");
+      });
+  });
 });
 
 describe("/api/*", () => {
