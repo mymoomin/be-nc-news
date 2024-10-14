@@ -7,7 +7,7 @@ const {
 
 exports.getArticleById = (request, response, next) => {
   const { article_id } = request.params;
-  fetchArticleById(article_id)
+  return fetchArticleById(article_id)
     .then((article) => {
       response.status(200).send({ article });
     })
@@ -15,7 +15,7 @@ exports.getArticleById = (request, response, next) => {
 };
 
 exports.getArticles = (request, response, next) => {
-  fetchArticles()
+  return fetchArticles()
     .then((articles) => {
       response.status(200).send({ articles });
     })
