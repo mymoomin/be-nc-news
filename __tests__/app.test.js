@@ -62,6 +62,14 @@ describe("/api/articles/:article_id", () => {
         });
       });
   });
+  test("GET: 404 -- responds with a 404 Not Found and appropriate error message when the article does not exist", () => {
+    return request(app)
+      .get("/api/articles/10000")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article not found");
+      });
+  });
 });
 
 describe("/api/*", () => {
