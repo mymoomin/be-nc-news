@@ -3,12 +3,11 @@ const express = require("express");
 const endpoints = require("./endpoints.json");
 const { getTopics } = require("./controllers/topics.controllers.js");
 const { getArticleById } = require("./controllers/articles.controllers.js");
+const { getRoot } = require("./controllers/root.controllers.js");
 
 const app = express();
 
-app.get("/api", (request, response, next) => {
-  response.status(200).send({ endpoints });
-});
+app.get("/api", getRoot);
 
 app.get("/api/topics", getTopics);
 

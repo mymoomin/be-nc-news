@@ -21,8 +21,8 @@ describe("/api", () => {
     return request(app)
       .get("/api")
       .expect(200)
-      .then((res) => {
-        expect(res.body.endpoints).toStrictEqual(endpoints);
+      .then(({ body: { endpoints } }) => {
+        expect(endpoints).toStrictEqual(endpoints);
       });
   });
 });
@@ -32,8 +32,7 @@ describe("/api/topics", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
-      .then((res) => {
-        const topics = res.body.topics;
+      .then(({ body: { topics } }) => {
         expect(topics).toHaveLength(3);
         topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug", expect.any(String));
@@ -66,16 +65,16 @@ describe("/api/articles/:article_id", () => {
     return request(app)
       .get("/api/articles/10000")
       .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("Article not found");
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
       });
   });
   test("GET: 400 -- responds with a 400 Bad Request and appropriate error message when the request is invalid", () => {
     return request(app)
       .get("/api/articles/not-a-number")
       .expect(400)
-      .then((res) => {
-        expect(res.body.msg).toBe("Invalid input");
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid input");
       });
   });
 });
@@ -85,8 +84,8 @@ describe("/api/*", () => {
     return request(app)
       .get("/api/not-an-endpoint")
       .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("unknown endpoint");
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("unknown endpoint");
       });
   });
 });
