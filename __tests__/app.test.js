@@ -294,6 +294,12 @@ describe("/api/comments/:comment_id", () => {
       .then(() => db.query("SELECT * FROM comments WHERE comment_id = 3"))
       .then(({ rows: comments }) => expect(comments).toHaveLength(0));
   });
+  test("DELETE: 404 -- responds with 404 Not Found and an appropriate error message when the comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/1000")
+      .expect(404)
+      .then(({ body: { msg } }) => expect(msg).toBe("Comment not found"));
+  });
 });
 
 describe("/api/*", () => {
