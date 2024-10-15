@@ -10,6 +10,7 @@ const {
   patchArticleById,
 } = require("./controllers/articles.controllers.js");
 const { deleteCommentById } = require("./controllers/comments.controllers.js");
+const { getUsers } = require("./controllers/users.controllers.js");
 
 const app = express();
 
@@ -30,6 +31,8 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.get("/api/users", getUsers);
 
 app.all("*", (request, response, next) => {
   response.status(404).send({ msg: "unknown endpoint" });

@@ -308,6 +308,23 @@ describe("/api/comments/:comment_id", () => {
   });
 });
 
+describe("/api/users", () => {
+  test("GET: 200 -- responds with an array containing every user", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
+          expect(() => new URL(user.avatar_url)).not.toThrow();
+        });
+      });
+  });
+});
+
 describe("/api/*", () => {
   test("ANY: 404 -- responds with a 404 Not Found and appropriate error message for an unknown url and/or method", () => {
     return request(app)
