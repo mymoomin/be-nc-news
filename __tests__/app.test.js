@@ -286,6 +286,16 @@ describe("/api/articles/:article_id/comments", () => {
   });
 });
 
+describe("/api/comments/:comment_id", () => {
+  test("DELETE: 204 -- deletes the comment from the database", () => {
+    return request(app)
+      .delete("/api/comments/3")
+      .expect(204)
+      .then(() => db.query("SELECT * FROM comments WHERE comment_id = 3"))
+      .then(({ rows: comments }) => expect(comments).toHaveLength(0));
+  });
+});
+
 describe("/api/*", () => {
   test("ANY: 404 -- responds with a 404 Not Found and appropriate error message for an unknown url and/or method", () => {
     return request(app)
