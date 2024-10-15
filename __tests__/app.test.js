@@ -300,6 +300,12 @@ describe("/api/comments/:comment_id", () => {
       .expect(404)
       .then(({ body: { msg } }) => expect(msg).toBe("Comment not found"));
   });
+  test("DELETE: 400 -- responds with 400 Bad Request and an appropriate error message when the comment ID is invalid", () => {
+    return request(app)
+      .delete("/api/comments/not-a-number")
+      .expect(400)
+      .then(({ body: { msg } }) => expect(msg).toBe("Invalid input"));
+  });
 });
 
 describe("/api/*", () => {
