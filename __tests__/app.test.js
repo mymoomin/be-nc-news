@@ -124,6 +124,15 @@ describe("/api/articles/:article_id", () => {
         });
       });
   });
+  test("PATCH: 404 -- responds with 404 Not Found and an appropriate error message when the article does not exist", () => {
+    return request(app)
+      .patch("/api/articles/1000")
+      .send({ inc_votes: -40 })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
+      });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
