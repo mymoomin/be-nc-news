@@ -104,6 +104,69 @@ describe("/api/articles/:article_id", () => {
         expect(msg).toBe("Invalid input");
       });
   });
+
+  test("PATCH: 200 -- updates the article's votes and responds with the article data", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -40 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          author: "butter_bridge",
+          title: "Living in the shadow of a great man",
+          article_id: 1,
+          body: "I find this existence challenging",
+          topic: "mitch",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 60,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("PATCH: 404 -- responds with 404 Not Found and an appropriate error message when the article does not exist", () => {
+    return request(app)
+      .patch("/api/articles/1000")
+      .send({ inc_votes: -40 })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
+      });
+  });
+  test("PATCH: 400 -- responds with 400 Bad Request and an appropriate error message when the body is missing its `inc_votes` property", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ increment_votes: -40 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Missing required property: inc_votes");
+      });
+  });
+  test("PATCH: 400 -- responds with 400 Bad Request and an appropriate error message when the `inc_votes` property isn't a valid number", () => {
+    return Promise.all([
+      request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "hii" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid input");
+        }),
+      request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: Infinity })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid input");
+        }),
+      request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: NaN })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid input");
+        }),
+    ]);
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
