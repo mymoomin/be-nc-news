@@ -133,6 +133,40 @@ describe("/api/articles/:article_id", () => {
         expect(msg).toBe("Article not found");
       });
   });
+  test("PATCH: 400 -- responds with 400 Bad Request and an appropriate error message when the body is missing its `inc_votes` property", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ increment_votes: -40 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Missing required property: inc_votes");
+      });
+  });
+  test("PATCH: 400 -- responds with 400 Bad Request and an appropriate error message when the `inc_votes` property isn't a valid number", () => {
+    return Promise.all([
+      request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "hii" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid input");
+        }),
+      request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: Infinity })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid input");
+        }),
+      request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: NaN })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid input");
+        }),
+    ]);
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
