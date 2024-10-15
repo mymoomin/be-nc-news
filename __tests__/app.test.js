@@ -286,6 +286,28 @@ describe("/api/articles/:article_id/comments", () => {
   });
 });
 
+describe("/api/comments/:comment_id", () => {
+  test("DELETE: 204 -- deletes the comment from the database", () => {
+    return request(app)
+      .delete("/api/comments/3")
+      .expect(204)
+      .then(() => db.query("SELECT * FROM comments WHERE comment_id = 3"))
+      .then(({ rows: comments }) => expect(comments).toHaveLength(0));
+  });
+  test("DELETE: 404 -- responds with 404 Not Found and an appropriate error message when the comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/1000")
+      .expect(404)
+      .then(({ body: { msg } }) => expect(msg).toBe("Comment not found"));
+  });
+  test("DELETE: 400 -- responds with 400 Bad Request and an appropriate error message when the comment ID is invalid", () => {
+    return request(app)
+      .delete("/api/comments/not-a-number")
+      .expect(400)
+      .then(({ body: { msg } }) => expect(msg).toBe("Invalid input"));
+  });
+});
+
 describe("/api/*", () => {
   test("ANY: 404 -- responds with a 404 Not Found and appropriate error message for an unknown url and/or method", () => {
     return request(app)
