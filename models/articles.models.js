@@ -11,32 +11,36 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
   }
 
   let whereClause = "";
-  if (topic) {
+  if (topic !== undefined) {
     whereClause = format("WHERE topic = %L", topic);
   }
 
   const queryString = format(
     `SELECT
-    a.author,
-    a.title,
-    a.article_id,
-    a.topic,
-    a.created_at,
-    a.votes,
-    a.article_img_url,
-    COUNT(comments.comment_id)::INT as comment_count
-  FROM 
-    articles AS a 
-    LEFT JOIN comments ON a.article_id = comments.article_id
-  ${whereClause}
-  GROUP BY
-    a.article_id
-  ORDER BY
-    %I %s`,
+      a.author,
+      a.title,
+      a.article_id,
+      a.topic,
+      a.created_at,
+      a.votes,
+      a.article_img_url,
+      COUNT(comments.comment_id)::INT as comment_count
+    FROM
+      articles AS a
+      LEFT JOIN comments ON a.article_id = comments.article_id
+    ${whereClause}
+    GROUP BY
+      a.article_id
+    ORDER BY
+      %I %s`,
     sort_by,
     order
   );
-  return db.query(queryString).then(({ rows: articles }) => articles);
+  articlesPromise = db.query(queryString);
+  topicPromise = whereClause ? fetchTopicBySlug(topic) : true;
+  return Promise.all([articlesPromise, topicPromise]).then(
+    ([{ rows: articles }]) => articles
+  );
 };
 
 const fetchArticleById = (article_id) => {
@@ -60,6 +64,19 @@ const fetchUserByUsername = (username) => {
     .then(({ rows: users }) => {
       if (!users.length) {
         return Promise.reject({ status: 404, msg: "User not found" });
+      }
+      return users[0];
+    });
+};
+
+// rejects if the topic doesn't exist
+// If we ever make a GET /api/topic/:slug endpoint I'll move this there
+const fetchTopicBySlug = (slug) => {
+  return db
+    .query("SELECT * FROM topics WHERE slug = $1", [slug])
+    .then(({ rows: users }) => {
+      if (!users.length) {
+        return Promise.reject({ status: 404, msg: "Topic not found" });
       }
       return users[0];
     });
