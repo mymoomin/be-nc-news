@@ -1,7 +1,7 @@
 const db = require("../db/connection.js");
 const format = require("pg-format");
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
+exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
   //greenlisting
   if (order !== "asc" && order !== "desc") {
     return Promise.reject({
@@ -9,6 +9,12 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
       msg: "Sort order must be 'asc' or 'desc'",
     });
   }
+
+  let whereClause = "";
+  if (topic) {
+    whereClause = format("WHERE topic = %L", topic);
+  }
+
   const queryString = format(
     `SELECT
     a.author,
@@ -22,6 +28,7 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
   FROM 
     articles AS a 
     LEFT JOIN comments ON a.article_id = comments.article_id
+  ${whereClause}
   GROUP BY
     a.article_id
   ORDER BY

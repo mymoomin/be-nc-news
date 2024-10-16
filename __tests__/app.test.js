@@ -196,6 +196,18 @@ describe("/api/articles", () => {
         }),
     ]);
   });
+
+  test("GET?topic=: 200 -- responds with an array of all articles with the given topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
 });
 
 describe("/api/articles/:article_id", () => {
