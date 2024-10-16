@@ -105,5 +105,23 @@
   "DELETE /api/comments/:comment_id": {
     "description": "deletes the comment with the given id",
     "queries": []
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse" : {
+      "users": [
+        {
+          "username": "cooljmessy",
+          "name": "Peter Messy",
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/1/1a/MR_MESSY_4A.jpg/revision/latest/scale-to-width-down/250?cb=20170730171002"
+        },
+        {
+          "username": "weegembump",
+          "name": "Gemma Bump",
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/7e/MrMen-Bump.png/revision/latest?cb=20180123225553"
+        }
+      ]
+    }
   }
 }
