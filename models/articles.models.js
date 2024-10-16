@@ -1,5 +1,6 @@
 const db = require("../db/connection.js");
 const format = require("pg-format");
+const { fetchUserByUsername } = require("./users.models.js");
 
 exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
   //greenlisting
@@ -58,19 +59,6 @@ const fetchArticleById = (article_id) => {
 };
 
 exports.fetchArticleById = fetchArticleById;
-
-// rejects if the user doesn't exist
-// If we ever make a GET /api/users/:username endpoint I'll move this there
-const fetchUserByUsername = (username) => {
-  return db
-    .query("SELECT * FROM users WHERE username = $1", [username])
-    .then(({ rows: users }) => {
-      if (!users.length) {
-        return Promise.reject({ status: 404, msg: "User not found" });
-      }
-      return users[0];
-    });
-};
 
 // rejects if the topic doesn't exist
 // If we ever make a GET /api/topic/:slug endpoint I'll move this there
