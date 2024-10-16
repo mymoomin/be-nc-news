@@ -67,6 +67,68 @@ describe("/api/articles", () => {
         });
       });
   });
+  test("GET?sort_by=: 200 -- responds with an array sorted by the given column", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?sort_by=created_at")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("author", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("title", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("article_id", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=topic")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("topic", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("votes", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=article_img_url")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("article_img_url", {
+            descending: true,
+          });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=comment_count")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("comment_count", { descending: true });
+        }),
+    ]);
+  });
 });
 
 describe("/api/articles/:article_id", () => {
