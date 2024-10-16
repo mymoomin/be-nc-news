@@ -16,6 +16,13 @@ const app = express();
 
 app.use(express.json());
 
+app.use((request, response, next) => {
+  if (process.env.NODE_ENV === "production") {
+    console.log(request.method, request.url);
+  }
+  next();
+});
+
 app.get("/api", getRoot);
 
 app.get("/api/topics", getTopics);
