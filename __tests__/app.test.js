@@ -155,6 +155,25 @@ describe("/api/articles", () => {
         .then(({ body: { msg } }) => expect(msg).toBe("Missing column name")),
     ]);
   });
+
+  test("GET?order=: 200 -- responds with an array sorted in the given order", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?order=desc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("created_at", { descending: false });
+        }),
+    ]);
+  });
 });
 
 describe("/api/articles/:article_id", () => {

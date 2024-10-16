@@ -1,7 +1,7 @@
 const db = require("../db/connection.js");
 const format = require("pg-format");
 
-exports.fetchArticles = (sort_by = "created_at") => {
+exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
   const queryString = format(
     `SELECT
     a.author,
@@ -18,8 +18,9 @@ exports.fetchArticles = (sort_by = "created_at") => {
   GROUP BY
     a.article_id
   ORDER BY
-    %I DESC`,
-    sort_by
+    %I %s`,
+    sort_by,
+    order
   );
   return db.query(queryString).then(({ rows: articles }) => articles);
 };
