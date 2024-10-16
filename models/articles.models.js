@@ -1,27 +1,35 @@
 const db = require("../db/connection.js");
-const { articleData } = require("../db/data/test-data/index.js");
+const format = require("pg-format");
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `SELECT
-        a.author,
-        a.title,
-        a.article_id,
-        a.topic,
-        a.created_at,
-        a.votes,
-        a.article_img_url,
-        COUNT(comments.comment_id)::INT as comment_count
-      FROM 
-        articles AS a 
-        LEFT JOIN comments ON a.article_id = comments.article_id
-      GROUP BY
-        a.article_id
-      ORDER BY
-        created_at DESC`
-    )
-    .then(({ rows: articles }) => articles);
+exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
+  //greenlisting
+  if (order !== "asc" && order !== "desc") {
+    return Promise.reject({
+      status: 400,
+      msg: "Sort order must be 'asc' or 'desc'",
+    });
+  }
+  const queryString = format(
+    `SELECT
+    a.author,
+    a.title,
+    a.article_id,
+    a.topic,
+    a.created_at,
+    a.votes,
+    a.article_img_url,
+    COUNT(comments.comment_id)::INT as comment_count
+  FROM 
+    articles AS a 
+    LEFT JOIN comments ON a.article_id = comments.article_id
+  GROUP BY
+    a.article_id
+  ORDER BY
+    %I %s`,
+    sort_by,
+    order
+  );
+  return db.query(queryString).then(({ rows: articles }) => articles);
 };
 
 const fetchArticleById = (article_id) => {

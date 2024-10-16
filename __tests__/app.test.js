@@ -67,6 +67,135 @@ describe("/api/articles", () => {
         });
       });
   });
+
+  test("GET?sort_by=: 200 -- responds with an array sorted by the given column", () => {
+    // possibly more tests than necessary
+    return Promise.all([
+      request(app)
+        .get("/api/articles?sort_by=created_at")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("author", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("title", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("article_id", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=topic")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("topic", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("votes", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=article_img_url")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("article_img_url", {
+            descending: true,
+          });
+        }),
+      request(app)
+        .get("/api/articles?sort_by=comment_count")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("comment_count", { descending: true });
+        }),
+    ]);
+  });
+  test("GET?sort_by=: 400 -- responds with 400 Bad Request and an appropriate error message when the column name is invalid or missing", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?sort_by=created_date")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Unknown column name")),
+      request(app)
+        .get("/api/articles?sort_by=1")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Unknown column name")),
+      request(app)
+        .get("/api/articles?sort_by={'a': 'b'}")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Unknown column name")),
+      request(app)
+        .get("/api/articles?sort_by")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Missing column name")),
+      request(app)
+        .get("/api/articles?sort_by=")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Missing column name")),
+    ]);
+  });
+
+  test("GET?order=: 200 -- responds with an array sorted in the given order", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?order=desc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        }),
+      request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("created_at", { descending: false });
+        }),
+    ]);
+  });
+  test("GET?order=: 400 -- responds with 400 Bad Request and an appropriate error message when the sort order is invalid or missing", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?order=ascending")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Sort order must be 'asc' or 'desc'");
+        }),
+      request(app)
+        .get("/api/articles?order=desc; SELECT * FROM users; --")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Sort order must be 'asc' or 'desc'");
+        }),
+      request(app)
+        .get("/api/articles?order")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Sort order must be 'asc' or 'desc'");
+        }),
+    ]);
+  });
 });
 
 describe("/api/articles/:article_id", () => {
