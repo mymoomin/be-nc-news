@@ -174,6 +174,28 @@ describe("/api/articles", () => {
         }),
     ]);
   });
+  test("GET?order=: 400 -- responds with 400 Bad Request and an appropriate error message when the sort order is invalid or missing", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?order=ascending")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Sort order must be 'asc' or 'desc'");
+        }),
+      request(app)
+        .get("/api/articles?order=desc; SELECT * FROM users; --")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Sort order must be 'asc' or 'desc'");
+        }),
+      request(app)
+        .get("/api/articles?order")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Sort order must be 'asc' or 'desc'");
+        }),
+    ]);
+  });
 });
 
 describe("/api/articles/:article_id", () => {

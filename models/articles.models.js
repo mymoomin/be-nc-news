@@ -2,6 +2,13 @@ const db = require("../db/connection.js");
 const format = require("pg-format");
 
 exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
+  //greenlisting
+  if (order !== "asc" && order !== "desc") {
+    return Promise.reject({
+      status: 400,
+      msg: "Sort order must be 'asc' or 'desc'",
+    });
+  }
   const queryString = format(
     `SELECT
     a.author,
