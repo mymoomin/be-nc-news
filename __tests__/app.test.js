@@ -67,6 +67,7 @@ describe("/api/articles", () => {
         });
       });
   });
+
   test("GET?sort_by=: 200 -- responds with an array sorted by the given column", () => {
     // possibly more tests than necessary
     return Promise.all([
