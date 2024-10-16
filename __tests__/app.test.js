@@ -196,6 +196,37 @@ describe("/api/articles", () => {
         }),
     ]);
   });
+
+  test("GET?topic=: 200 -- responds with an array of all articles with the given topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("GET?topic=: 200 -- responds with an empty array when no articles have that topic", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => expect(articles).toHaveLength(0));
+  });
+
+  test("GET?topic=: 404 -- responds 404 Not Found when the topic doesn't exist", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?topic=not-a-topic")
+        .expect(404)
+        .then(({ body: { msg } }) => expect(msg).toBe("Topic not found")),
+      request(app)
+        .get("/api/articles?topic=")
+        .expect(404)
+        .then(({ body: { msg } }) => expect(msg).toBe("Topic not found")),
+    ]);
+  });
 });
 
 describe("/api/articles/:article_id", () => {
