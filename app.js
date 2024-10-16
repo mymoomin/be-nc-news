@@ -50,6 +50,10 @@ app.use((error, request, response, next) => {
   // 22P02: wrong type, 23502: unexpected null
   if (error.code === "22P02" || error.code === "23502") {
     response.status(400).send({ msg: "Invalid input" });
+  } else if (error.code === "42703") {
+    response.status(400).send({ msg: "Unknown column name" });
+  } else if (error.code === "42601") {
+    response.status(400).send({ msg: "Missing column name" });
   } else {
     next(error);
   }

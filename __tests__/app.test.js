@@ -68,6 +68,7 @@ describe("/api/articles", () => {
       });
   });
   test("GET?sort_by=: 200 -- responds with an array sorted by the given column", () => {
+    // possibly more tests than necessary
     return Promise.all([
       request(app)
         .get("/api/articles?sort_by=created_at")
@@ -127,6 +128,30 @@ describe("/api/articles", () => {
           expect(articles).toHaveLength(13);
           expect(articles).toBeSortedBy("comment_count", { descending: true });
         }),
+    ]);
+  });
+  test("GET?sort_by=: 400 -- responds with 400 Bad Request and an appropriate error message when the column name is invalid or missing", () => {
+    return Promise.all([
+      request(app)
+        .get("/api/articles?sort_by=created_date")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Unknown column name")),
+      request(app)
+        .get("/api/articles?sort_by=1")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Unknown column name")),
+      request(app)
+        .get("/api/articles?sort_by={'a': 'b'}")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Unknown column name")),
+      request(app)
+        .get("/api/articles?sort_by")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Missing column name")),
+      request(app)
+        .get("/api/articles?sort_by=")
+        .expect(400)
+        .then(({ body: { msg } }) => expect(msg).toBe("Missing column name")),
     ]);
   });
 });
