@@ -1,21 +1,12 @@
 const express = require("express");
 
-const { getTopics } = require("./controllers/topics.controllers.js");
-const { getRoot } = require("./controllers/root.controllers.js");
-const {
-  getArticleById,
-  getArticles,
-  getCommentsByArticleId,
-  postCommentByArticleId,
-  patchArticleById,
-} = require("./controllers/articles.controllers.js");
-const { deleteCommentById } = require("./controllers/comments.controllers.js");
-const { getUsers } = require("./controllers/users.controllers.js");
+const apiRouter = require("./routers/api.router.js");
 
 const app = express();
 
 app.use(express.json());
 
+// Logging for render.com
 app.use((request, response, next) => {
   if (process.env.NODE_ENV === "production") {
     console.log(request.method, request.url);
@@ -23,28 +14,15 @@ app.use((request, response, next) => {
   next();
 });
 
-app.get("/api", getRoot);
+// All API routes
+app.use("/api", apiRouter);
 
-app.get("/api/topics", getTopics);
-
-app.get("/api/articles", getArticles);
-
-app.get("/api/articles/:article_id", getArticleById);
-
-app.patch("/api/articles/:article_id", patchArticleById);
-
-app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
-
-app.post("/api/articles/:article_id/comments", postCommentByArticleId);
-
-app.delete("/api/comments/:comment_id", deleteCommentById);
-
-app.get("/api/users", getUsers);
-
+// This has to stay in app.js because we need a 404 for all pages outside of /api/
 app.all("*", (request, response, next) => {
   response.status(404).send({ msg: "unknown endpoint" });
 });
 
+// Handles custom errors
 app.use((error, request, response, next) => {
   if (error.status && error.msg) {
     response.status(error.status).send({ msg: error.msg });
@@ -53,6 +31,7 @@ app.use((error, request, response, next) => {
   }
 });
 
+// Handles Postgres errors
 app.use((error, request, response, next) => {
   // 22P02: wrong type, 23502: unexpected null
   if (error.code === "22P02" || error.code === "23502") {
@@ -66,6 +45,7 @@ app.use((error, request, response, next) => {
   }
 });
 
+// Handles unforeseen errors. If anything reaches here it's a bug.
 app.use((error, request, response, next) => {
   console.log(error);
   response.status(500).send({ msg: `Unknown error: ${error}` });
