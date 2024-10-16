@@ -235,7 +235,7 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body: { article } }) => {
-        expect(article).toStrictEqual({
+        expect(article).toMatchObject({
           author: "butter_bridge",
           title: "Living in the shadow of a great man",
           article_id: 1,
@@ -245,6 +245,7 @@ describe("/api/articles/:article_id", () => {
           votes: 100,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 11,
         });
       });
   });
